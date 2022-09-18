@@ -20,7 +20,12 @@
         </div>
         <div class="is-divider" data-content="OR"></div>
         <div class="card-content is-center">
-          <form method="POST" action="/add-table" @submit.prevent="submitForm">
+          <form
+            method="POST"
+            action="/add-table"
+            enctype="multipart/form-data"
+            @submit.prevent="submitForm"
+          >
             <div class="field">
               <h2 class="pb-2">Seu nome</h2>
               <p class="control has-icons-left has-icons-right">
@@ -108,7 +113,7 @@
                       class="file-input"
                       type="file"
                       id="file"
-                      name="attachment[]"
+                      name="file"
                       multiple
                       @change="onFileChange($event)"
                       ref="files"
@@ -162,10 +167,12 @@
 <script>
 import axios from 'axios'
 import FormData from 'form-data'
+import { v4 as uuidv4 } from 'uuid'
 
 export default {
   data() {
     return {
+      userId: '',
       userName: '',
       userEmail: '',
       arquivoExcel: null,
@@ -192,25 +199,25 @@ export default {
         this.invalidInput = true
         return
       }
+
       this.invalidInput = false
+      this.userId = uuidv4()
 
       const dataForm = new FormData()
+      // Apensar todos os elementos do formulário
+      dataForm.append('id', this.userId)
+      dataForm.append('name', this.userName)
+      dataForm.append('email', this.userEmail)
+      dataForm.append('type', this.selectedType)
       dataForm.append('file', this.arquivoExcel)
 
-      const data = {
-        name: this.userName,
-        email: this.userEmail,
-        type: this.selectedType,
-        file: dataForm,
-      }
-      console.log(data)
       const config = {
         header: {
           'Content-Type': 'multipart/form-data',
         },
       }
-      axios
-        .post('http://localhost:3000/add-table', data, config)
+      await axios
+        .post('http://localhost:3000/add-table', dataForm, config)
         .then((response) => {
           console.log(response)
           console.log(response.status)
