@@ -12,15 +12,49 @@
         </div>
       </article>
       <div v-else>
-        <div class="card" v-for="el in allData" :key="el.id">
+        <div class="card box" v-for="(el, index) in allData" :key="el.id">
           <div class="columns">
-            <h5>Incluído por: {{ el.name }}</h5>
-            <div class="creator column is-one-quarter"></div>
-            <div class="column">
-              <h5>Tipo de veículo: {{ el.type }}</h5>
+            <div class="creator column is-one-third">
+              <button
+                class="button is-info is-light"
+                v-for="item in allBrands"
+                :key="item"
+                @:click="getBrandDetails"
+              >
+                {{ item }}
+              </button>
             </div>
             <div class="column">
-              <button>Ver veículo</button>
+              <h5>Informações do veículo:</h5>
+              <ul v-for="item in theBrandDetails">
+                <li class="title is-4 mt-3">{{ item['Modelo'] }}</li>
+                <table class="table is-fullwidth is-bordered is-striped mb-5">
+                  <thead>
+                    <tr>
+                      <th>Ano / Modelo</th>
+                      <th>Preço</th>
+                      <th>Código FIPE</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td>{{ item['Ano modelo'] }}</td>
+                      <td>{{ item['Preço médio'] }}</td>
+                      <td>{{ item['Código FIPE'] }}</td>
+                    </tr>
+                  </tbody>
+                </table>
+              </ul>
+            </div>
+          </div>
+          <div class="card-footer">
+            <div class="columns is-centered">
+              <div class="column">
+                <p class="name subtitle is-7">Criado por {{ el.name }}</p>
+              </div>
+              <div class="column">
+                <h6 class="email subtitle is-7">{{ el.email }}</h6>
+              </div>
             </div>
           </div>
         </div>
@@ -30,25 +64,37 @@
 </template>
 <script>
 import axios from 'axios'
+import { ref } from 'vue'
 
 export default {
-  data() {
-    return {
-      allData: {},
-    }
+  setup() {
+    const allData = ref({})
+    const allBrands = ref([])
+    const theBrandDetails = ref([])
+
+    return { allData, allBrands, theBrandDetails }
   },
-  methods: {},
-  computed: {
-    hasData() {
-      console.log(this.allData)
-      return this.allData
+  methods: {
+    getBrandDetails(brand) {
+      // Obtendo listagem de veículos por marca
+      const brandsArray = { ...this.allData[0].file }
+      const theBrand = brand.target.innerText
+      brandsArray[theBrand].forEach((el) => {
+        this.theBrandDetails.push(el)
+      })
     },
   },
   beforeCreate() {
     axios
       .get('http://localhost:3000/tabela-fipe')
       .then((response) => {
+        // Realizando destructuring dos dados recebidos
         this.allData = { ...response.data }
+        // Destructuring das marcas da planilha
+        const brandsArray = { ...this.allData[0].file }
+        for (let el in brandsArray) {
+          this.allBrands.push(el)
+        }
       })
       .catch((err) => console.log(err))
   },

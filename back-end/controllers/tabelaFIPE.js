@@ -29,7 +29,6 @@ const postAddTable = (async (req, res) => {
 const getTables = (async (req, res) => {
   // 1 - Busca todos os itens no Banco de Dados MySQL
   const data = await Tabela.findAll()
-  console.log(data)
   res.json(data)
 })
 
