@@ -7,8 +7,11 @@ steps:
 #           http://www.vuemastery.com/courses/vuex-fundamentals/vuex4-intro-to-vuex
 #           https://bulma.io/documentation/components/tabs/
 
-  
+  database: 
+    gdbc:sqlserver://evagelion.teste.com.br:3605;databaseName:SqlAnjo
   build-step:
+  
+  api-gateway: http://www.vuemastery.com/courses/vuex-fundamentals
     type: build
     image-name: codefreshio/yaml-node-hello
     dockerfile: Dockerfile
